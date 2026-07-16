@@ -1,0 +1,172 @@
+@startuml AI
+set namespaceSeparator AI
+class "BasicIA" as Zappy_ai.AI.basic_ia.BasicIA {
+  Connect_nbr : int
+  inventory : dict
+  is_in_elev : bool
+  level : int
+  nb_steps : int
+  nbr_move : int
+  next_command : NoneType, str
+  objectif : dict
+  objectif_coords : NoneType, Optional[tuple]
+  param_is_change : bool
+  team : str
+  the_map : dict
+  visible : dict
+  add_level()
+  get_state()
+  handle_command(command: str, result)
+  reset_all()
+  set_state(state: bool)
+  take_decision() -> str | None
+}
+class "ElevationReq" as Zappy_ai.Utils.elevation.ElevationReq {
+  deraumere : int
+  level : int
+  linemate : int
+  mendiane : int
+  phiras : int
+  players : int
+  sibur : int
+  thystame : int
+}
+class "ForkIA" as Zappy_ai.AI.forkIA.ForkIA {
+  enemy_on_tile : bool
+  inventory : dict
+  is_ejecting : bool
+  is_forking : bool
+  is_in_elev : bool
+  level
+  nb_steps : int
+  nbr_move : int
+  next_command : NoneType, str
+  objectif : NoneType, tuple
+  objectif_coords : NoneType, tuple
+  param_is_change : bool
+  team : str
+  the_map : dict
+  visible : dict
+  add_level()
+  get_state()
+  handle_command(command: str, result)
+  reset_all()
+  set_state(state: bool)
+  take_decision() -> str | None
+}
+class "Handshake" as Zappy_ai.client.handshake.Handshake {
+  client_num : NoneType, int
+  done
+  sock
+  team_name : str
+  world_x : NoneType, int
+  world_y : NoneType, int
+  process(line: str) -> bool
+}
+class "PRO_ForkIA" as Zappy_ai.AI.PRO_ForkIA.PRO_ForkIA {
+  after_underway : bool
+  enemy_on_tile : bool
+  i_launched_incantation : bool
+  inventory : dict
+  is_ejecting : bool
+  is_forking : bool
+  is_in_elev : bool
+  level
+  nb_steps : int
+  nbr_fork : int
+  nbr_move : int
+  next_command : NoneType, str
+  objectif : NoneType, tuple
+  objectif_coords : NoneType, tuple
+  param_is_change : bool
+  team : str
+  the_map : NoneType, dict
+  total_forks : int
+  visible : dict
+  want_switch : bool
+  add_level()
+  get_state()
+  handle_broadcast(direction: int, text: str)
+  handle_command(command: str, result)
+  reset_all()
+  set_state(state: bool)
+  take_decision() -> str | None
+}
+class "PRO_IA" as Zappy_ai.AI.PRO_MAX_IA.PRO_IA {
+  Connect_nbr : int
+  after_underway : bool
+  inventory : dict
+  is_in_elev : bool
+  level : int
+  nb_steps : int
+  nbr_move : int
+  nbr_of_incantation : int
+  next_command : NoneType, str
+  objectif : NoneType, tuple
+  objectif_coords : NoneType, Optional[tuple]
+  param_is_change : bool
+  skip_incantation : int
+  team : str
+  the_map : dict
+  visible : dict
+  add_level()
+  get_state()
+  handle_command(command: str, result)
+  reset_all()
+  set_state(state: bool)
+  take_decision() -> str | None
+}
+class "PRO_IA" as Zappy_ai.AI.PRO_IA.PRO_IA {
+  Connect_nbr : int
+  after_underway : bool
+  confirmed_levels : list[int]
+  i_launched_incantation : bool
+  inventory : dict
+  is_in_elev : bool
+  level : int
+  nb_steps : int
+  nbr_move : int
+  nbr_of_incantation : int
+  next_command : NoneType, str
+  objectif : NoneType, tuple
+  objectif_coords : NoneType, Optional[tuple]
+  param_is_change : bool
+  partner_tile : NoneType
+  rendez_row : int
+  skip_incantation : int
+  state : str
+  team : str
+  the_map : dict
+  total_forks : int
+  visible : dict
+  wait_counter : int
+  want_switch : bool
+  add_level()
+  get_state()
+  handle_broadcast(direction: int, text: str)
+  handle_command(command: str, result)
+  handle_elevation_result(new_level: int | None)
+  handle_elevation_underway()
+  reset_all()
+  set_state(state: bool)
+  take_decision() -> str | None
+}
+class "Response" as Zappy_ai.command.status.Response {
+  name
+}
+class "SocketManager" as Zappy_ai.client.socket_manager.SocketManager {
+  host : str
+  pending : deque
+  pending_commands : list
+  port : int
+  recv_buffer : str
+  send_buffer : str
+  sock : NoneType, socket
+  connect()
+  dispatch(lines: list)
+  flush_send()
+  queue_command(command: str, callback)
+  read_available()
+  tick(timeout)
+}
+@enduml

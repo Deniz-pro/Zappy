@@ -1,0 +1,213 @@
+@startuml Server
+namespace zappy #AliceBlue {
+    enum ClientType #LightPink
+    {
+        AI
+        GUI
+        UNKNOWN
+    }
+
+    struct ElevationReq #GhostWhite
+    {
+        int level
+        int players
+        int linemate
+        int deraumere
+        int sibur
+        int mendiane
+        int phiras
+        int thystame
+    }
+
+    struct Client #GhostWhite
+    {
+        int id
+        int fd
+        bool dead
+        std::string handshakeBuf
+        NetworkBuffer networkBuffer
+        std::string toSend
+        ClientType type
+        bool handshakeDone
+        bool response
+        std::unique_ptr<ICommands> handler
+        Player player
+    }
+
+    enum CommandType #LightPink
+    {
+        FORWARD
+        RIGHT
+        LEFT
+        LOOK
+        INVENTORY
+        BROADCAST
+        CONNECT_NBR
+        FORK
+        EJECT
+        TAKE
+        SET
+        INCANTATION
+        MSZ
+        BCT
+        MCT
+        TNA
+        PPO
+        PLV
+        PIN
+        SGT
+        SST
+        UNKNOWN
+    }
+
+    struct Command #GhostWhite
+    {
+        CommandType type
+        std::string arg
+    }
+    
+    struct Params #GhostWhite
+    {
+        int port
+        int width
+        int height
+        std::vector<std::string> teams
+        int clientsNb
+        int freq
+    }
+
+    class ParseArgs
+    {
+        ParseArgs(int argc, char **argv)
+        Params parseFlags()
+    }
+
+    class CommandParser
+    {
+        CommandParser()
+        Command parseCommand(const std::string &line) const
+    }
+
+    interface ICommands #Lavender
+    {
+        \~ICommands()
+        dispatch(const Command &command)
+    }
+
+    abstract ACommands #Application
+    {
+        # using Handler = std::function<void(const std::string &arg)>
+        # std::unordered_map<CommandType, Handler> _cmds
+        # init()
+        # int _clientId
+        # GameState &_gameState
+        # GUIEvents &_events
+        # Server *_server
+        # Client *getClient() const
+        ACommands(int clientId, GameState &game_state,
+        GUIEvents &events, Server *server)
+        dispatch(const Command &command)
+    }
+
+    class AICommands
+    {
+        # init()
+        AICommands(int clientId, GameState &game_sate,
+        GUIEvents &events, Server *srv)
+    }
+
+    class GUICommands
+    {
+        # init()
+        GUICommands(int clientId, GameState &game_sate,
+        GUIEvents &events, Server *srv)
+    }
+    
+    class GUIEvents
+    {
+        GUIEvents(std::deque<Client> &clients)
+        notifyPpo(const Player &player)
+        notifyMct(const GameState &state)
+        notifyPnw(const Player &player)
+        notifyPex(const Player &player)
+        notifyPbc(const Player &player, const std::string message)
+        notifyPic(const Player &player, const std::vector<int> &players)
+        notifyPie(const Player &player, bool result)
+        notifyPin(const Player &player)
+        notifyPlv(const Player &player)
+        notifyPfk(const Player &player)
+        notifyPdr(const Player &player, int resource)
+        notifyPgt(const Player &player, int resource)
+        notifyPdi(const Player &player)
+        notifyEnw(const Player &player, const Egg &egg)
+        notifyEbo(const Egg &egg)
+        notifyEdi(const Egg &egg)
+        sendSmg(const std::string &message)
+    }
+
+    struct Tile #GhostWhite
+    {
+        int food
+        int linemate
+        int deraumere
+        int sibur
+        int mendiane
+        int phiras
+        int thystame
+    }
+
+    class Map
+    {
+        Map(int width, int height)
+        buildMap()
+        int getWidth() const
+        int getHeight() const
+        bool isInBounds(int x, int y) const
+        int wrapX(int x) const
+        int wrapY(int y) const
+        Tile &getTile(int x, int y)
+        const Tile &getTile(int x, int y) const
+        const std::vector<std::vector<Tile>> &getTiles() const
+    }
+    
+    class NetworkBuffer
+    {
+        NetworkBuffer()
+        AppendData(const std::string &data)
+        bool has_command() const
+        Command pop_command()
+    }
+
+    class Server {
+        Server(const Params &params)
+        \~Server()
+        void run()
+        Client *getClientId(int id)
+    }
+
+    class GameState
+    {
+    }
+
+}
+
+Client <.. ClientType
+Server <.. Client
+Client <.. NetworkBuffer
+CommandParser <.. CommandType
+NetworkBuffer <.. CommandParser
+Client <.. ICommands
+NetworkBuffer <.. Command
+ICommands <.. Command
+ICommands <|-- ACommands
+ACommands <|-- AICommands
+ACommands <|-- GUICommands
+AICommands <.. ElevationReq
+Server <.. Params
+Server <.. GameState
+Server <.. GUIEvents
+Params <.. ParseArgs
+GameState <.. Map
+Map <.. Tile
+
+@enduml

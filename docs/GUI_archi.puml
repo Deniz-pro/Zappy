@@ -1,0 +1,148 @@
+@startuml GUI
+namespace zappy #AliceBlue {
+    struct Params #GhostWhite
+    {
+        float centerX
+        float centerZ
+        float distance
+    }
+
+    struct EggVisual #GhostWhite
+    {
+        Color color
+        float scale
+        float alpha
+    }
+
+    struct WindowConfig #GhostWhite
+    {
+        int width
+        int height
+        const char *title
+    }
+
+    struct PlayerModel #GhostWhite
+    {
+        Model model
+        Vector3 modelScale
+        float baseYOffset
+        bool ready
+    }
+
+    class TileUtils
+    {
+        static Color getDominantColor(const Tile &tile)
+    }
+
+    namespace Network #Application {
+        class Client
+        {
+            Client()
+            \~Client()
+            Client(const Client &)
+            Client &operator=(const Client &)
+            connectTo(const std::string &host, int port)
+            handshake()
+            sendMessage(const std::string &msg)
+            flushSend()
+            std::string receive()
+            bool isConnected() const
+        }
+    
+        class ClientUtils
+        {
+            int openTcpSocket(const std::string &host, int port)
+            sendPartial(int fd, std::string &buffer)
+        }
+    }
+
+    class Commands
+    {
+        msz(std::istringstream &stream, GameState &state)
+        bct(std::istringstream &stream, GameState &state)
+        tna(std::istringstream &stream, GameState &state)
+        pnw(std::istringstream &stream, GameState &state)
+        ppo(std::istringstream &stream, GameState &state)
+        plv(std::istringstream &stream, GameState &state)
+        pin(std::istringstream &stream, GameState &state)
+        pdi(std::istringstream &stream, GameState &state)
+        pic(std::istringstream &stream, GameState &state)
+        pie(std::istringstream &stream, GameState &state)
+        pbc(std::istringstream &stream, GameState &state)
+        enw(std::istringstream &stream, GameState &state)
+        ebo(std::istringstream &stream, GameState &state)
+        edi(std::istringstream &stream, GameState &state)
+        pgt(std::istringstream &stream, GameState &state)
+        pdr(std::istringstream &stream, GameState &state)
+        seg(std::istringstream &stream, GameState &state)
+        sgt(std::istringstream &stream, GameState &state)
+        smg(std::istringstream &stream, GameState &state)
+        pfk(std::istringstream &stream, GameState &state)
+        pex(std::istringstream &stream, GameState &state)
+        sst(std::istringstream &stream, GameState &state)
+        suc(std::istringstream &stream, GameState &state)
+        sbp(std::istringstream &stream, GameState &state)
+    }
+
+    class Parser {
+        parse(const std::string &line,
+        GameState &state)
+    }
+
+    class CameraController
+    {
+        CameraController(const Params &params)
+        update()
+        const Camera3D &getCamera() const
+    }
+
+    class EggUtils
+    {
+        EggVisual computeVisual(const zappy::Egg &egg);
+    }
+
+    class MapRenderer
+    {
+        MapRenderer()
+        draw(GameState &state)
+    }
+
+    class PlayerRenderer
+    {
+        PlayerRenderer()
+        \~PlayerRenderer()
+        ensureLoaded()
+        draw(const GameState &state) const
+        drawLabels(const GameState &state,
+            const Camera3D &camera) const
+        handleSelection(GameState &state,
+            const Camera3D &camera) const
+        Color getTeamColor(const std::string &team)
+    }
+
+    class Window {
+        Window(const WindowConfig &config,
+        Client &client);
+        \~Window();
+        void run();
+    }
+
+    class GameState {
+    }
+}
+
+Window <.. WindowConfig
+Window <.. Client
+Window <.. Parser
+Window <.. MapRenderer
+Window <.. GameState
+Parser <.. Commands
+CameraController <.. Params
+MapRenderer <.. CameraController
+MapRenderer <.. PlayerRenderer
+MapRenderer <.. TileUtils
+MapRenderer <.. EggUtils
+EggUtils <.. EggVisual
+PlayerRenderer <.. PlayerModel
+
+@enduml
