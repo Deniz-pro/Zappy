@@ -30,12 +30,24 @@ void PlayerRenderer::draw(const GameState &state) const
 void PlayerRenderer::drawLabels(const GameState &state,
     const Camera3D &camera) const
 {
+    Vector2 screen = {0};
+    const char *label = nullptr;
+    Color teamColor = WHITE;
+    int fontSize = 11;
+    int textW = 0;
+    int bx = 0;
+    int by = 0;
+
     for (const auto &[id, p] : state.getPlayers()) {
-        Vector2 screen = GetWorldToScreen(playerWorldPos(p,
-            LABEL_Y_OFFSET), camera);
-        DrawText(TextFormat("Player %d Level %d %s", id, p.level, p.team.c_str()),
-            static_cast<int>(screen.x) - 6,
-            static_cast<int>(screen.y), 11, WHITE);
+        screen = GetWorldToScreen(playerWorldPos(p, LABEL_Y_OFFSET), camera);
+        label = TextFormat("#%d L%d %s", id, p.level, p.team.c_str());
+        teamColor = getTeamColor(p.team);
+        textW = MeasureText(label, fontSize);
+        bx = static_cast<int>(screen.x) - textW / 2 - 4;
+        by = static_cast<int>(screen.y) - 2;
+        DrawRectangle(bx, by, textW + 8, fontSize + 4, Fade(BLACK, 0.6f));
+        DrawRectangleLines(bx, by, textW + 8, fontSize + 4, Fade(teamColor, 0.85f));
+        DrawText(label, bx + 4, by + 2, fontSize, WHITE);
     }
 }
 

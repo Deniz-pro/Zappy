@@ -31,6 +31,8 @@ class MapRenderer {
     private:
         void initCamera(int mapW, int mapH);
         void drawScene(GameState &state);
+        void drawPlanet(Vector3 center, float radius) const;
+        void drawOrbitalRing(Vector3 center, float radius) const;
         void drawTiles(const GameState &state) const;
         void drawTile(int col, int row, const Tile &tile) const;
         void drawResourceMeshes(const GameState &state) const;

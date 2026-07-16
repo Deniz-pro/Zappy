@@ -10,6 +10,7 @@
 #include "gui/renderer/Config.hpp"
 #include "gui/renderer/TileUtils.hpp"
 #include "state/Player.hpp"
+#include "server/Elevation.hpp"
 #include <raylib.h>
 #include <string>
 #include <vector>
@@ -126,25 +127,79 @@ static void drawInventoryItems(const Player &p, int x, int y)
     }
 }
 
+static int computeProgressHeight(const Player &p)
+{
+    int count = 0;
+
+    if (p.level >= 8)
+        return 0;
+    const auto &req = zappy::ELEVATION_TABLE[p.level - 1];
+    const int needed[6] = {req.linemate, req.deraumere, req.sibur,
+        req.mendiane, req.phiras, req.thystame};
+    for (int i = 0; i < 6; i++)
+        if (needed[i] > 0) count++;
+    return HUD_FONT_SIZE + 4 + count * 12;
+}
+
+static void drawProgressBars(const Player &p, const int needed[6], int x, int y)
+{
+    int have = 0;
+    float ratio = 0.0f;
+
+    for (int i = 0; i < 6; i++) {
+        if (needed[i] == 0)
+            continue;
+        have = std::min(p.inventory[i + 1], needed[i]);
+        ratio = static_cast<float>(have) / needed[i];
+        DrawRectangle(x, y, 100, 8, DARKGRAY);
+        DrawRectangle(x, y, static_cast<int>(100.0f * ratio), 8,
+        RESOURCE_SHAPE_COLORS[i + 1]);
+        DrawText(TextFormat("%s %d/%d", RESOURCE_FULL_NAMES[i + 1], have, needed[i]),
+        x + 104, y - 1, HUD_FONT_SIZE - 2, WHITE);
+        y += 12;
+    }
+}
+
+static void drawLevelProgress(const Player &p, int x, int y)
+{
+    if (p.level >= 8)
+        return;
+    const auto &req = zappy::ELEVATION_TABLE[p.level - 1];
+    const int needed[6] = {req.linemate, req.deraumere, req.sibur,
+        req.mendiane, req.phiras, req.thystame};
+
+    DrawText(TextFormat("Next lvl %d (x%d players):", p.level + 1, req.players),
+        x, y, HUD_FONT_SIZE, GOLD);
+    drawProgressBars(p, needed, x, y + HUD_FONT_SIZE + 4);
+}
+
 static void drawInventoryPanel(const Player &p, int x, int y)
 {
-    int panelH = 8 * (HUD_FONT_SIZE + 2) + 8;
+    int progressH = computeProgressHeight(p);
+    int panelH = 8 * (HUD_FONT_SIZE + 2) + 8 + progressH;
+    int itemsY = y + HUD_FONT_SIZE + 4;
 
-    DrawRectangle(x - 4, y - 4, HUD_LEGEND_OFFSET, panelH, Fade(BLACK, 0.7f));
+    DrawRectangle(x - 4, y - 4, HUD_LEGEND_OFFSET + 60, panelH, Fade(BLACK, 0.7f));
     DrawText(TextFormat("Player %d %s Level %d", p.id, p.team.c_str(), p.level),
-        x, y, HUD_FONT_SIZE, WHITE);
-    drawInventoryItems(p, x, y + HUD_FONT_SIZE + 4);
+    x, y, HUD_FONT_SIZE, WHITE);
+    drawInventoryItems(p, x, itemsY);
+    drawLevelProgress(p, x, itemsY + 7 * (HUD_FONT_SIZE + 2) + 2);
 }
 
 void HudRenderer::drawInventory(const GameState &state) const
 {
     int x = 10;
-    int y = GetScreenHeight() - 8 * (HUD_FONT_SIZE + 2) - 18;
+    int progressH = 0;
+    int panelH = 0;
+    int y = 0;
+    auto it = state.getPlayers().find(state.selectedPlayerId);
 
     if (state.selectedPlayerId == -1)
         return;
-    auto it = state.getPlayers().find(state.selectedPlayerId);
     if (it == state.getPlayers().end())
         return;
+    progressH = computeProgressHeight(it->second);
+    panelH = 8 * (HUD_FONT_SIZE + 2) + 8 + progressH;
+    y = GetScreenHeight() - panelH - 14;
     drawInventoryPanel(it->second, x, y);
 }
