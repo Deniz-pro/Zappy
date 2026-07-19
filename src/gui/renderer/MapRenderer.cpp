@@ -14,6 +14,8 @@
 #include <algorithm>
 #include <cmath>
 
+MapRenderer::~MapRenderer() = default;
+
 void MapRenderer::initCamera(int mapW, int mapH)
 {
     CameraController::Params params;
@@ -80,7 +82,8 @@ void MapRenderer::drawResourceMesh(const Tile &tile, int col, int row) const
     for (int i = 0; i < 7; i++) {
         if (tile.resources[i] == 0)
             continue;
-        Vector3 base = {cx + RESOURCE_OFFSETS[i].x, TILE_HEIGHT, cz + RESOURCE_OFFSETS[i].y};
+        Vector3 base = {cx + RESOURCE_OFFSETS[i].x, TILE_HEIGHT,
+            cz + RESOURCE_OFFSETS[i].y};
         drawResourceShape(i, base, RESOURCE_SHAPE_COLORS[i], tile.resources[i]);
     }
 }
@@ -99,50 +102,21 @@ void MapRenderer::drawTiles(const GameState &state) const
             drawTile(col, row, state.getTiles()[row][col]);
 }
 
-void MapRenderer::drawPlanet(Vector3 center, float radius) const
-{
-    DrawSphereEx(center, radius, 32, 32, Color{50, 85, 30, 255});
-}
-
-void MapRenderer::drawOrbitalRing(Vector3 center, float radius) const
-{
-    float ringAngle = static_cast<float>(GetTime()) * -4.0f;
-    float ringInner = radius * 1.15f;
-    float ringOuter = radius * 1.45f;
-    int ringLines = 18;
-    float ringStep = (ringOuter - ringInner) / ringLines;
-    float r = 0.0f;
-    unsigned char alpha = 0;
-
-    rlPushMatrix();
-    rlTranslatef(center.x, center.y, center.z);
-    rlRotatef(ringAngle, 0.0f, 1.0f, 0.0f);
-    rlRotatef(20.0f, 1.0f, 0.0f, 0.0f);
-    BeginBlendMode(BLEND_ALPHA);
-    for (int i = 0; i <= ringLines; i++) {
-        r = ringInner + i * ringStep;
-        alpha = static_cast<unsigned char>(
-            100 + 80 * (1.0f - static_cast<float>(i) / ringLines));
-        DrawCircle3D({0.0f, 0.0f, 0.0f}, r,
-            {1.0f, 0.0f, 0.0f}, 90.0f, Color{200, 165, 80, alpha});
-    }
-    EndBlendMode();
-    rlPopMatrix();
-}
-
 void MapRenderer::drawScene(GameState &state)
 {
     float cx = (state.getMapWidth() - 1) * TILE_SPACING / 2.0f;
     float cz = (state.getMapHeight() - 1) * TILE_SPACING / 2.0f;
-    float mapSize = static_cast<float>(std::max(state.getMapWidth(),
-    state.getMapHeight()));
+    float mapSize = static_cast<float>(
+        std::max(state.getMapWidth(), state.getMapHeight()));
     float radius = mapSize * TILE_SPACING * 1.8f;
     Vector3 sphereCenter = {cx, -radius - 0.5f, cz};
 
     BeginMode3D(_camera->getCamera());
     _skybox.draw(_camera->getCamera());
-    drawPlanet(sphereCenter, radius);
-    drawOrbitalRing(sphereCenter, radius);
+    _planet.draw(sphereCenter, radius);
+    _planet.drawOrbitalRing(sphereCenter, radius);
+    _moon.draw(sphereCenter, radius);
+    _planet.drawShootingStars(sphereCenter, radius);
     drawTiles(state);
     drawResourceMeshes(state);
     drawEggs(state);

@@ -72,7 +72,9 @@ GUI_SRC		=	src/gui/Main.cpp		\
 				src/gui/renderer/TileUtils.cpp			\
 				src/gui/renderer/EggUtils.cpp			\
 				src/gui/renderer/MinimapRenderer.cpp		\
-				src/gui/renderer/SkyboxRenderer.cpp
+				src/gui/renderer/SkyboxRenderer.cpp		\
+				src/gui/renderer/PlanetRenderer.cpp		\
+				src/gui/renderer/MoonRenderer.cpp
 
 SERVER_OBJ	=	$(SERVER_SRC:.cpp=.o)
 GUI_OBJ	=	$(GUI_SRC:.cpp=.o)

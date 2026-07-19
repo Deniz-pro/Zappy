@@ -13,6 +13,8 @@
     #include "gui/renderer/EggUtils.hpp"
     #include "gui/renderer/Config.hpp"
     #include "gui/renderer/SkyboxRenderer.hpp"
+    #include "gui/renderer/PlanetRenderer.hpp"
+    #include "gui/renderer/MoonRenderer.hpp"
     #include <deque>
     #include <memory>
     #include <vector>
@@ -26,13 +28,12 @@ inline constexpr Vector2 RESOURCE_OFFSETS[7] = {
 class MapRenderer {
     public:
         MapRenderer() = default;
+        ~MapRenderer();
         void draw(GameState &state);
         void handleSelection(GameState &state);
     private:
         void initCamera(int mapW, int mapH);
         void drawScene(GameState &state);
-        void drawPlanet(Vector3 center, float radius) const;
-        void drawOrbitalRing(Vector3 center, float radius) const;
         void drawTiles(const GameState &state) const;
         void drawTile(int col, int row, const Tile &tile) const;
         void drawResourceMeshes(const GameState &state) const;
@@ -52,6 +53,8 @@ class MapRenderer {
         std::unique_ptr<CameraController> _camera;
         PlayerRenderer _playerRenderer;
         SkyboxRenderer _skybox;
+        PlanetRenderer _planet;
+        MoonRenderer _moon;
 };
 
 #endif
